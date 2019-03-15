@@ -39,12 +39,14 @@ function createRenderer(bundle, options) {
 }
 
 let renderer;
+let distHtml;
 let readyPromise;
 const templatePath = resolve('./src/index.html');
 if (isProd) {
   const template = fs.readFileSync(templatePath, 'utf-8');
   const bundle = require('./dist/vue-ssr-server-bundle.json');
   const clientManifest = require('./dist/vue-ssr-client-manifest.json');
+  distHtml = fs.readFileSync('./dist/index.html', 'utf-8');
   renderer = createRenderer(bundle, {
     template,
     clientManifest
@@ -53,8 +55,9 @@ if (isProd) {
   readyPromise = require('./build/setup-dev-server')(
     app,
     templatePath,
-    (bundle, options) => {
+    (bundle, options, dist) => {
       renderer = createRenderer(bundle, options);
+      distHtml = dist;
     }
   )
 }
@@ -81,7 +84,7 @@ function render(req, res) {
     if (err.url) {
       res.redirect(err.url)
     } else if (err.client) {
-      res.sendFile(__dirname + '/dist/index.html');
+      res.send(distHtml);
     } else if (err.code === 404) {
       res.status(404).send('404 | Page Not Found')
     } else {
@@ -124,10 +127,6 @@ app.use('/dist', serve('./dist', true));
 app.get('*', isProd ? render : (req, res) => {
   readyPromise.then(() => render(req, res));
 });
-
-// app.get('*', (req, res) => {
-//   res.sendFile(__dirname + '/dist/index.html');
-// })
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {

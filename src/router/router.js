@@ -3,9 +3,9 @@ import Router from 'vue-router';
 
 Vue.use(Router);
 
-const Login = () => import('../page/login.vue');
-const TodoList = () => import('../page/todoList.vue');
-const TodoList2 = () => import('../page/todoList2.vue');
+const Login = () => import(/* webpackChunkName: "login" */ '../page/login.vue');
+const TodoList = () => import(/* webpackChunkName: "todolist1" */ '../page/todoList.vue');
+const TodoList2 = () => import(/* webpackChunkName: "todolist2" */ '../page/todoList2.vue');
 
 export default function createRouter (token) {
   const router =  new Router({

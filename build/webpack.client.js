@@ -9,6 +9,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isProd = process.env.NODE_ENV === 'production';
 console.log(`isProd: ${isProd}`);
 
+const plugins = [
+  new VueSSRClientPlugin(),
+  new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    'process.env.VUE_ENV': '"client"'
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'index.html',
+    template: path.resolve(__dirname, '../src/index.html')
+  })
+];
+
+if (isProd) {
+  plugins.push(new MiniCssExtractPlugin({
+    filename: 'css/[name].[chunkhash].css'
+  }));
+}
+
 module.exports = merge(baseConfig, {
   entry: {
     app: './src/entry-client.js'
@@ -57,24 +75,5 @@ module.exports = merge(baseConfig, {
       name: "runtime"
     }
   },
-  plugins: isProd ? [
-    new VueSSRClientPlugin(),
-    new MiniCssExtractPlugin({
-      filename: 'common.[chunkhash].css'
-    }),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.VUE_ENV': '"client"'
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.resolve(__dirname, '../src/index.html')
-    })
-  ] : [
-    new VueSSRClientPlugin(),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      'process.env.VUE_ENV': '"client"'
-    })
-  ]
+  plugins: plugins
 })

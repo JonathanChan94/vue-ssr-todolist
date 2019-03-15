@@ -15,16 +15,17 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   let bundle;
   let template;
   let clientManifest;
+  let distHtml;
 
   let ready;
   const readyPromise = new Promise(r => {ready = r});
   const update = () => {
-    if (bundle && clientManifest) {
+    if (bundle && clientManifest && distHtml) {
       ready()
       cb(bundle, {
         template,
         clientManifest
-      })
+      }, distHtml)
     }
   }
 
@@ -49,6 +50,7 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   });
   app.use(devMiddleware);
   clientCompiler.plugin('done', stats => {
+    console.log('client compiler');
     stats = stats.toJson()
     stats.errors.forEach(err => console.error(err))
     stats.warnings.forEach(err => console.warn(err))
@@ -57,6 +59,10 @@ module.exports = function setupDevServer (app, templatePath, cb) {
       devMiddleware.fileSystem,
       'vue-ssr-client-manifest.json'
     ))
+    distHtml = readFile(
+      devMiddleware.fileSystem,
+      'index.html'
+    )
     update()
   })
 
@@ -68,6 +74,7 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   const mfs = new MFS();
   serverCompiler.outputFileSystem = mfs;
   serverCompiler.watch({}, (err, stats) => {
+    console.log('server compiler');
     if (err) throw err
     stats = stats.toJson()
     if (stats.errors.length) return
