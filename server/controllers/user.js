@@ -2,6 +2,7 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const salt = bcrypt.genSaltSync(10);
+const env = require('../../env');
 
 const login = async (req, res) => {
   const user = await User.getUserByName({
@@ -9,7 +10,7 @@ const login = async (req, res) => {
   });
   if (user) {
     if (bcrypt.compareSync(req.body.password, user.password)) {
-      var token = jwt.sign({ name: user.name }, 'test-secret', {
+      var token = jwt.sign({ name: user.name }, env.secret, {
         expiresIn: 60 * 60
       })
       res.cookie('token', token, {maxAge: 1000 * 60 * 60});
