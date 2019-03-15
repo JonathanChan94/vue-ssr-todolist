@@ -2,6 +2,7 @@ import createApp from './app';
 
 export default context => {
   return new Promise((resolve, reject) => {
+
     const { url, cookies } = context;
 
     const { app, router, store } = createApp(cookies && cookies.token);
@@ -24,16 +25,11 @@ export default context => {
           })
         }
       })).then(() => {
-
         context.state = store.state;
-        context.serverError = false;
 
         resolve(app);
-      }).catch(err => {
-        console.log('rendererror','entry-server');
-        context.serverError = true;
-        
-        resolve(app)
+      }).catch(() => {
+        reject({client: true});
       });
     }, reject)
   })

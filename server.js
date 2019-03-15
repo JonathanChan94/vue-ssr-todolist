@@ -80,6 +80,8 @@ function render(req, res) {
   const handleError = err => {
     if (err.url) {
       res.redirect(err.url)
+    } else if (err.client) {
+      res.sendFile(__dirname + '/dist/index.html');
     } else if (err.code === 404) {
       res.status(404).send('404 | Page Not Found')
     } else {
@@ -122,6 +124,10 @@ app.use('/dist', serve('./dist', true));
 app.get('*', isProd ? render : (req, res) => {
   readyPromise.then(() => render(req, res));
 });
+
+// app.get('*', (req, res) => {
+//   res.sendFile(__dirname + '/dist/index.html');
+// })
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {

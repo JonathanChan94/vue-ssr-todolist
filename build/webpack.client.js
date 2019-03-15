@@ -4,6 +4,7 @@ const merge = require('webpack-merge');
 const baseConfig = require('./webpack.base.js');
 const VueSSRClientPlugin = require('vue-server-renderer/client-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const isProd = process.env.NODE_ENV === 'production';
 console.log(`isProd: ${isProd}`);
@@ -64,6 +65,10 @@ module.exports = merge(baseConfig, {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.VUE_ENV': '"client"'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: path.resolve(__dirname, '../src/index.html')
     })
   ] : [
     new VueSSRClientPlugin(),

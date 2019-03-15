@@ -3,11 +3,11 @@ import App from './App.vue';
 import createRouter from './router/router';
 import createStore from './store/index';
 import { sync } from 'vuex-router-sync';
-import headMixin from './utils/head';
+// import headMixin from './utils/head';
 
 import './component/index';
 
-Vue.mixin(headMixin);
+// Vue.mixin(headMixin);
 
 export default function createApp (token) {
 

@@ -8,8 +8,18 @@
 </template>
 
 <script>
+import headMixin from '../utils/head';
+
 export default {
   name: 'Login',
+  mixins: [headMixin],
+  head () {
+    return {
+      title: '登录',
+      description: 'this is login page',
+      keywords: 'login'
+    }
+  },
   data () {
     return {
       name: '',

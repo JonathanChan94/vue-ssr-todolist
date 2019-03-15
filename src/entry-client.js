@@ -4,8 +4,10 @@ import Cookies from 'js-cookie';
 import bus from './utils/bus';
 
 Vue.mixin({
-  beforeRouteUpdate (to, from, next) {
-    const { asyncData } = this.$options
+  beforeRouteUpdate(to, from, next) {
+    const {
+      asyncData
+    } = this.$options
     if (asyncData) {
       asyncData({
         store: this.$store,
@@ -17,7 +19,11 @@ Vue.mixin({
   }
 })
 
-const { app, router, store } = createApp(Cookies.get('token'));
+const {
+  app,
+  router,
+  store
+} = createApp(Cookies.get('token'));
 
 bus.$on('toLogin', () => {
   router.push('/login');
@@ -46,7 +52,10 @@ router.onReady(() => {
     // 这里如果有加载指示器 (loading indicator)，就触发
     Promise.all(activated.map(c => {
       if (c.asyncData) {
-        return c.asyncData({ store, route: to });
+        return c.asyncData({
+          store,
+          route: to
+        });
       }
     })).then(() => {
       // 停止加载指示器(loading indicator)
@@ -56,18 +65,30 @@ router.onReady(() => {
     })
   })
 
-  if (window.__serverRenderError) {
-    clientGetData(router.currentRoute)
+  // 如果没有initial_state，则回退到客户端渲染
+  if (!window.__INITIAL_STATE__) {
+    console.log('开启客户端渲染');
+    const matchedComps = router.getMatchedComponents();
+    Promise.all(matchedComps.map(c => {
+      return c.asyncData && c.asyncData({
+        store,
+        route: router.currentRoute
+      })
+    })).then(() => {
+      app.$mount('#de-app');
+    })
+  } else {
+    app.$mount('#app');
   }
-
-  app.$mount('#app');
 })
 
-// 服务端数据预获取出现异常时，客户端再执行一次数据获取
-function clientGetData (route) {
+function clientGetData(route) {
   const matched = router.getMatchedComponents(route);
   Promise.all(matched.map(c => {
-    return c.asyncData && c.asyncData({ store, route });
+    return c.asyncData && c.asyncData({
+      store,
+      route
+    });
   })).then(() => {
     console.log('ok');
   }).catch(() => {});

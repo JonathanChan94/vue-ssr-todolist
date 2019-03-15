@@ -49,9 +49,11 @@ import Tabs from "../component/newTab/tabs.vue";
 import Tab from "../component/newTab/tab.vue";
 import Checkbox from "../component/checkbox/checkbox.vue";
 import { addItem, updateItem, deleteItem } from "../api/api";
+import headMixin from '../utils/head';
 
 export default {
   name: "TodoList",
+  mixins: [headMixin],
   components: { Tabs, Tab, Checkbox },
   head() {
     return {
@@ -65,11 +67,6 @@ export default {
   },
   data() {
     return {
-      head: {
-        title: 'todo list',
-        description: 'this is a todo list',
-        keywords: 'todo'
-      },
       index: 1,
       val: ""
     };
