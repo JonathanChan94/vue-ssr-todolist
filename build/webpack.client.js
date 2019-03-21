@@ -16,7 +16,12 @@ const plugins = [
     'process.env.VUE_ENV': '"client"'
   }),
   new HtmlWebpackPlugin({
-    filename: 'index.html',
+    filename: 'index.template.html',
+    template: path.resolve(__dirname, '../src/index.html'),
+    inject: false
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'index.degrade.html',
     template: path.resolve(__dirname, '../src/index.html')
   })
 ];

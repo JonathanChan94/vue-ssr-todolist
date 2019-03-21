@@ -15,17 +15,17 @@ module.exports = function setupDevServer (app, templatePath, cb) {
   let bundle;
   let template;
   let clientManifest;
-  let distHtml;
+  let degradeHtml;
 
   let ready;
   const readyPromise = new Promise(r => {ready = r});
   const update = () => {
-    if (bundle && clientManifest && distHtml) {
+    if (bundle && clientManifest && degradeHtml) {
       ready()
       cb(bundle, {
         template,
         clientManifest
-      }, distHtml)
+      }, degradeHtml)
     }
   }
 
@@ -59,9 +59,9 @@ module.exports = function setupDevServer (app, templatePath, cb) {
       devMiddleware.fileSystem,
       'vue-ssr-client-manifest.json'
     ))
-    distHtml = readFile(
+    degradeHtml = readFile(
       devMiddleware.fileSystem,
-      'index.html'
+      'index.degrade.html'
     )
     update()
   })

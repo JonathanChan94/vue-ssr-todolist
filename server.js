@@ -32,21 +32,21 @@ function createRenderer(bundle, options) {
       //   max: 1000,
       //   maxAge: 1000 * 60 * 15
       // }),
-      basedir: resolve('./dist'),
+      // basedir: resolve('./dist'),
       runInNewContext: false
     })
   )
 }
 
 let renderer;
-let distHtml;
+let degradeHtml;
 let readyPromise;
-const templatePath = resolve('./src/index.html');
+const templatePath = resolve('./dist/index.template.html');
 if (isProd) {
   const template = fs.readFileSync(templatePath, 'utf-8');
   const bundle = require('./dist/vue-ssr-server-bundle.json');
   const clientManifest = require('./dist/vue-ssr-client-manifest.json');
-  distHtml = fs.readFileSync('./dist/index.html', 'utf-8');
+  // degradeHtml = fs.readFileSync('./dist/index.html', 'utf-8');
   renderer = createRenderer(bundle, {
     template,
     clientManifest
@@ -57,7 +57,7 @@ if (isProd) {
     templatePath,
     (bundle, options, dist) => {
       renderer = createRenderer(bundle, options);
-      distHtml = dist;
+      degradeHtml = dist;
     }
   )
 }
@@ -84,7 +84,11 @@ function render(req, res) {
     if (err.url) {
       res.redirect(err.url)
     } else if (err.client) {
-      res.send(distHtml);
+      if (isProd) {
+        res.sendFile(__dirname + '/dist/index.degrade.html');
+      } else {
+        res.send(degradeHtml);
+      }
     } else if (err.code === 404) {
       res.status(404).send('404 | Page Not Found')
     } else {
